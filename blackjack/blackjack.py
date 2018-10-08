@@ -79,20 +79,22 @@ print("Reading configuration")
 #initial player money
 #money objective to end the game
 #number of hands without shuffle
-config_ndecks = int(input())
+config_file = open("config.txt", 'r')
+config_ndecks = int(config_file.readline())
 print("nDecks: "+str(config_ndecks))
-config_initialmoney = int(input())
+config_initialmoney = int(config_file.readline())
 print("Initial money: "+str(config_initialmoney))
-config_objectivemoney = int(input())
+config_objectivemoney = int(config_file.readline())
 print("Objective money: "+str(config_objectivemoney))
-config_nhands2shuffle = int(input())
+config_nhands2shuffle = int(config_file.readline())
 print("nHands 2 shuffle: "+str(config_nhands2shuffle))
+config_file.close()
 
 table = Table(config_ndecks,config_initialmoney,config_objectivemoney,config_nhands2shuffle)
 
 table.printTable()
 
-option = input("Select 1,2,3 in player mode or enter in banca mode. 4 to exit")
+option = input("Select 1,2,3 in player mode or enter in banca mode. 4 to exit  ")
 if option != '':
 	option = int(option)
 while(option != 4):
@@ -105,6 +107,6 @@ while(option != 4):
 	else:
 		table.bancaTurn()
 
-	option = input("Select 1,2,3 in player mode or enter in banca mode. 4 to exit")
+	option = input("Select 1,2,3 in player mode or enter in banca mode. 4 to exit  ")
 	if option != '':
 		option = int(option)
