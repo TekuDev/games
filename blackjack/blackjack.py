@@ -4,35 +4,35 @@ import random
 from enum import Enum
 
 class State(Enum):
-	SET_BET = 1
-	DEAL_CARD = 2
-	PLAYER_TURN = 3
-	BANCA_TURN = 4
-	RESOLVE_ROUND = 5
-	FINISH = 6
+    SET_BET = 1
+    DEAL_CARD = 2
+    PLAYER_TURN = 3
+    BANCA_TURN = 4
+    RESOLVE_ROUND = 5
+    FINISH = 6
 
 
 #Clases
 class Player():
-	"""docstring for Player"""
-	def __init__(self, money = 0, objective = 0):
-		self.money = money
-		self.objective = objective
-		self.currentHand = 0
-		self.currentBet = 0
+    """docstring for Player"""
+    def __init__(self, money = 0, objective = 0):
+        self.money = money
+        self.objective = objective
+        self.currentHand = 0
+        self.currentBet = 0
 
-	def setBet(self, bet):
-		self.currentBet = bet
+    def setBet(self, bet):
+        self.currentBet = bet
 
 class Deck():
-	"""docstring for Deck"""
-	def __init__(self,nDecks):
-		self.nDecks = nDecks
-		self.cards = [4*nDecks] * 13
-		print(self.cards)
+    """docstring for Deck"""
+    def __init__(self,nDecks):
+        self.nDecks = nDecks
+        self.cards = [4*nDecks] * 13
+        print(self.cards)
 
-	def getCard(self):
-		done = False
+    def getCard(self):
+        done = False
         while not done:
             card = random.randint(0,12)
             if self.cards[card] != 0:
@@ -48,25 +48,25 @@ class Deck():
         elif card == 1:
             card = "As"
             
-		return str(card)
+        return str(card)
 
-	def shuffle(self):
-		self.cards = [4*self.nDecks] * 13
+    def shuffle(self):
+        self.cards = [4*self.nDecks] * 13
 
 class Table():
-	"""docstring for Table"""
-	def __init__(self, nDecks, money, objective, nHands2shuffle):
-		self.deck = Deck(nDecks)
-		self.player = Player(money, objective)
-		self.nHands2shuffle = nHands2shuffle
-		self.bancaHand = 0
-		self.isPlayerTurn = True
-		self.playerCards = []
-		self.bancaCards = []
-		self.state = State.SET_BET
+    """docstring for Table"""
+    def __init__(self, nDecks, money, objective, nHands2shuffle):
+        self.deck = Deck(nDecks)
+        self.player = Player(money, objective)
+        self.nHands2shuffle = nHands2shuffle
+        self.bancaHand = 0
+        self.isPlayerTurn = True
+        self.playerCards = []
+        self.bancaCards = []
+        self.state = State.SET_BET
 
-	def card(self):
-		newcard = self.deck.getCard()
+    def card(self):
+        newcard = self.deck.getCard()
         if newcard not in ("10","J","Q","K","As"):
             self.player.currentHand += int(newcard)
         elif newcard in ("10","J","Q","K"):
@@ -78,38 +78,38 @@ class Table():
         
         self.playerCards.append(newcard)
 
-	def double(self):
-		pass
+    def double(self):
+        pass
 
-	def fold(self):
-		self.state = State.BANCA_TURN
+    def fold(self):
+        self.state = State.BANCA_TURN
 
-	def playerTurn(self):
-		option = int(input("1-Card 2-Double 3-Fold "))
-		if option == 1:
-			table.card()
-		elif option == 2:
-			table.double()
-		elif option == 3:
-			table.fold()
-		else:
-			print("Wrong option, you have to write 1,2 or 3 ")
+    def playerTurn(self):
+        option = int(input("1-Card 2-Double 3-Fold "))
+        if option == 1:
+            table.card()
+        elif option == 2:
+            table.double()
+        elif option == 3:
+            table.fold()
+        else:
+            print("Wrong option, you have to write 1,2 or 3 ")
 
-	def bancaTurn(self):
-		pass
+    def bancaTurn(self):
+        pass
 
-	def resolveState(self):
-		if self.state == State.SET_BET:
-			self.playerCards = []
-			self.bancaCards = []
-			bet = int(input("Introduce the bet for the next round "))
-			self.player.setBet(bet)
-			self.state = State.DEAL_CARD
+    def resolveState(self):
+        if self.state == State.SET_BET:
+            self.playerCards = []
+            self.bancaCards = []
+            bet = int(input("Introduce the bet for the next round "))
+            self.player.setBet(bet)
+            self.state = State.DEAL_CARD
 
-		elif self.state == State.DEAL_CARD:
-			card = self.deck.getCard()
+        elif self.state == State.DEAL_CARD:
+            card = self.deck.getCard()
             if card not in ("10","J","Q","K","As"):
-                self.player.currentHand += int(newcard)
+                self.player.currentHand += int(card)
             elif card in ("10","J","Q","K"):
                 self.player.currentHand += 10
             elif (self.player.currentHand+11) > 21:
@@ -117,11 +117,11 @@ class Table():
             else:
                 self.player.currentHand += 11
                 
-			self.playerCards.append(card)
+            self.playerCards.append(card)
 
-			card = self.deck.getCard()
-			if card not in ("10","J","Q","K","As"):
-                self.bancaHand += int(newcard)
+            card = self.deck.getCard()
+            if card not in ("10","J","Q","K","As"):
+                self.bancaHand += int(card)
             elif card in ("10","J","Q","K"):
                 self.bancaHand += 10
             elif (self.bancaHand+11) > 21:
@@ -129,11 +129,11 @@ class Table():
             else:
                 self.bancaHand += 11
                 
-			self.bancaCards.append(card)
+            self.bancaCards.append(card)
 
-			card = self.deck.getCard()
-			if card not in ("10","J","Q","K","As"):
-                self.player.currentHand += int(newcard)
+            card = self.deck.getCard()
+            if card not in ("10","J","Q","K","As"):
+                self.player.currentHand += int(card)
             elif card in ("10","J","Q","K"):
                 self.player.currentHand += 10
             elif (self.player.currentHand+11) > 21:
@@ -141,44 +141,44 @@ class Table():
             else:
                 self.player.currentHand += 11
                 
-			self.playerCards.append(card)
+            self.playerCards.append(card)
             
-			self.state = State.PLAYER_TURN
+            self.state = State.PLAYER_TURN
 
-		elif self.state == State.PLAYER_TURN:
-			self.playerTurn()
+        elif self.state == State.PLAYER_TURN:
+            self.playerTurn()
 
-		elif self.state == State.BANCA_TURN:
-			self.bancaTurn()
-			self.state = State.RESOLVE_ROUND
+        elif self.state == State.BANCA_TURN:
+            self.bancaTurn()
+            self.state = State.RESOLVE_ROUND
 
-		elif self.state == State.RESOLVE_ROUND:
-			self.state = State.SET_BET
+        elif self.state == State.RESOLVE_ROUND:
+            self.state = State.SET_BET
 
-		else:
-			print("Wrong state "+self.state)
+        else:
+            print("Wrong state "+self.state)
 
-	def printTable(self):
-		print("--------------------------------------")
-		#banca
-		print(str(self.bancaHand) + " ", end="")
-		for c in self.bancaCards:
-			print(c + " ", end="")
-		print(": banca")
+    def printTable(self):
+        print("--------------------------------------")
+        #banca
+        print(str(self.bancaHand) + " ", end="")
+        for c in self.bancaCards:
+            print(c + " ", end="")
+        print(": banca")
 
-		#player
-		print(str(self.player.currentHand) + " ", end="")
-		for c in self.playerCards:
-			print(c + " ", end="")
-		print(": player")
-		print("Player money: "+str(self.player.money))
-		print("Player bet: "+str(self.player.currentBet))
+        #player
+        print(str(self.player.currentHand) + " ", end="")
+        for c in self.playerCards:
+            print(c + " ", end="")
+        print(": player")
+        print("Player money: "+str(self.player.money))
+        print("Player bet: "+str(self.player.currentBet))
 
-		#options
-		print("--------------------------------------")
+        #options
+        print("--------------------------------------")
 
 
-		
+        
 
 
 #Main:
@@ -204,5 +204,5 @@ table = Table(config_ndecks,config_initialmoney,config_objectivemoney,config_nha
 
 table.printTable()
 while(table.state != State.FINISH):
-	table.resolveState()
-	table.printTable()
+    table.resolveState()
+    table.printTable()
