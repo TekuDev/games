@@ -32,7 +32,22 @@ class Deck():
 		print(self.cards)
 
 	def getCard(self):
-		card = random.randint(0,12)
+		done = False
+        while not done:
+            card = random.randint(0,12)
+            if self.cards[card] != 0:
+                self.cards[card] -= 1
+                done = True
+        card += 1
+        if card == 11:
+            card = "J"
+        elif card == 12:
+            card = "Q"
+        elif card == 13:
+            card = "K"
+        elif card == 1:
+            card = "As"
+            
 		return str(card)
 
 	def shuffle(self):
@@ -51,7 +66,17 @@ class Table():
 		self.state = State.SET_BET
 
 	def card(self):
-		pass
+		newcard = self.deck.getCard()
+        if newcard not in ("10","J","Q","K","As"):
+            self.player.currentHand += int(newcard)
+        elif newcard in ("10","J","Q","K"):
+            self.player.currentHand += 10
+        elif (self.player.currentHand+11) > 21:
+            self.player.currentHand += 1
+        else:
+            self.player.currentHand += 11
+        
+        self.playerCards.append(newcard)
 
 	def double(self):
 		pass
@@ -83,16 +108,41 @@ class Table():
 
 		elif self.state == State.DEAL_CARD:
 			card = self.deck.getCard()
-			self.player.currentHand += int(card)
+            if card not in ("10","J","Q","K","As"):
+                self.player.currentHand += int(newcard)
+            elif card in ("10","J","Q","K"):
+                self.player.currentHand += 10
+            elif (self.player.currentHand+11) > 21:
+                self.player.currentHand += 1
+            else:
+                self.player.currentHand += 11
+                
 			self.playerCards.append(card)
 
 			card = self.deck.getCard()
-			self.bancaHand += int(card)
+			if card not in ("10","J","Q","K","As"):
+                self.bancaHand += int(newcard)
+            elif card in ("10","J","Q","K"):
+                self.bancaHand += 10
+            elif (self.bancaHand+11) > 21:
+                self.bancaHand += 1
+            else:
+                self.bancaHand += 11
+                
 			self.bancaCards.append(card)
 
 			card = self.deck.getCard()
-			self.player.currentHand += int(card)
+			if card not in ("10","J","Q","K","As"):
+                self.player.currentHand += int(newcard)
+            elif card in ("10","J","Q","K"):
+                self.player.currentHand += 10
+            elif (self.player.currentHand+11) > 21:
+                self.player.currentHand += 1
+            else:
+                self.player.currentHand += 11
+                
 			self.playerCards.append(card)
+            
 			self.state = State.PLAYER_TURN
 
 		elif self.state == State.PLAYER_TURN:
