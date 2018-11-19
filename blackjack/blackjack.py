@@ -66,6 +66,7 @@ class Table():
         self.state = State.SET_BET
 
     def card(self):
+        # Deal the new card and recalculate the hand value
         newcard = self.deck.getCard()
         if newcard not in ("10","J","Q","K","As"):
             self.player.currentHand += int(newcard)
@@ -77,34 +78,91 @@ class Table():
             self.player.currentHand += 11
         
         self.playerCards.append(newcard)
-
+        
+        # Evaluate if the player hand is > 21
+        if self.player.currentHand > 21:
+            print("The hand is over")
+            self.state = State.SET_BET
+        
+        
     def double(self):
-        pass
+        #Double the bet
+        self.player.money -= self.player.currentBet
+        self.player.currentBet += self.player.currentBet
+        
+        # Deal the new card and recalculate the hand value
+        newcard = self.deck.getCard()
+        if newcard not in ("10","J","Q","K","As"):
+            self.player.currentHand += int(newcard)
+        elif newcard in ("10","J","Q","K"):
+            self.player.currentHand += 10
+        elif (self.player.currentHand+11) > 21:
+            self.player.currentHand += 1
+        else:
+            self.player.currentHand += 11
+        
+        self.playerCards.append(newcard)
+        
+        # Evaluate if the player hand is > 21
+        if self.player.currentHand > 21:
+            print("The hand is over")
+            self.state = State.SET_BET
+        
+        self.state = State.BANCA_TURN
 
     def fold(self):
         self.state = State.BANCA_TURN
 
     def playerTurn(self):
-        option = int(input("1-Card 2-Double 3-Fold "))
+        option = int(input("1-Card 2-Double 3-Fold 4-Exit "))
         if option == 1:
             table.card()
         elif option == 2:
             table.double()
         elif option == 3:
             table.fold()
+        elif option == 4:
+            self.state = State.FINISH
         else:
-            print("Wrong option, you have to write 1,2 or 3 ")
+            print("Wrong option, you have to write 1, 2, 3 or 4 ")
 
     def bancaTurn(self):
-        pass
+        if self.bancaHand < 17:
+            newcard = self.deck.getCard()
+            if newcard not in ("10","J","Q","K","As"):
+                self.bancaHand += int(newcard)
+            elif newcard in ("10","J","Q","K"):
+                self.bancaHand += 10
+            elif (self.player.currentHand+11) > 21:
+                self.bancaHand += 1
+            else:
+                self.bancaHand += 11
+            
+            self.bancaCards.append(newcard)
+        
+        if self.bancaHand >= 17:
+            self.state = State.RESOLVE_ROUND
+            
 
     def resolveState(self):
         if self.state == State.SET_BET:
+            if self.player.money == 0:
+                print("GAME OVER")
+                self.state = State.FINISH
+                return
             self.playerCards = []
             self.bancaCards = []
-            bet = int(input("Introduce the bet for the next round "))
-            self.player.setBet(bet)
-            self.state = State.DEAL_CARD
+            self.bancaHand = 0
+            self.player.currentHand = 0
+            bet = int(input("Introduce the bet for the next round (-1 to exit) "))
+            if bet == -1:
+                self.state = State.FINISH
+            elif bet <= self.player.money:
+                self.player.setBet(bet)
+                self.player.money -= bet
+                self.state = State.DEAL_CARD
+            else:
+                print("You cannot bet more than money you have")
 
         elif self.state == State.DEAL_CARD:
             card = self.deck.getCard()
@@ -150,9 +208,24 @@ class Table():
 
         elif self.state == State.BANCA_TURN:
             self.bancaTurn()
-            self.state = State.RESOLVE_ROUND
 
         elif self.state == State.RESOLVE_ROUND:
+            if self.player.currentHand == 21 and self.bancaHand != 21:
+                print("Black Jack!!!!!")
+                self.player.money += self.player.currentBet*2+self.player.currentBet/2
+                
+            elif self.bancaHand > 21 or self.player.currentHand > self.bancaHand:
+                print("Player win the round")
+                self.player.money += self.player.currentBet*2
+                
+            elif self.player.currentHand == self.bancaHand:
+                print("Push")
+                self.player.money += self.player.currentBet
+                
+            else:
+                print("Player lose this round")
+            
+            self.player.currentBet = 0
             self.state = State.SET_BET
 
         else:
