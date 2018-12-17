@@ -23,6 +23,10 @@ class Player():
 
     def setBet(self, bet):
         self.currentBet = bet
+        
+    def reset(self):
+        self.currentHand = 0
+        self.currentBet = 0
 
 class Deck():
     """docstring for Deck"""
@@ -60,10 +64,15 @@ class Table():
         self.player = Player(money, objective)
         self.nHands2shuffle = nHands2shuffle
         self.bancaHand = 0
-        self.isPlayerTurn = True
         self.playerCards = []
         self.bancaCards = []
         self.state = State.SET_BET
+        
+    def reset(self):
+        self.bancaHand = 0
+        self.playerCards = []
+        self.bancaCards = []
+        self.player.reset()
 
     def card(self):
         # Deal the new card and recalculate the hand value
@@ -82,11 +91,16 @@ class Table():
         # Evaluate if the player hand is > 21
         if self.player.currentHand > 21:
             print("The hand is over")
+            self.reset()
             self.state = State.SET_BET
         
         
     def double(self):
-        #Double the bet
+        #Double the bet if you can
+        if (self.player.money - self.player.currentBet) < 0:
+       	    print("You don't have enough money to double")
+            return
+        #else:
         self.player.money -= self.player.currentBet
         self.player.currentBet += self.player.currentBet
         
@@ -107,8 +121,8 @@ class Table():
         if self.player.currentHand > 21:
             print("The hand is over")
             self.state = State.SET_BET
-        
-        self.state = State.BANCA_TURN
+        else:
+            self.state = State.BANCA_TURN
 
     def fold(self):
         self.state = State.BANCA_TURN
@@ -225,7 +239,7 @@ class Table():
             else:
                 print("Player lose this round")
             
-            self.player.currentBet = 0
+            self.reset()
             self.state = State.SET_BET
 
         else:
@@ -234,13 +248,13 @@ class Table():
     def printTable(self):
         print("--------------------------------------")
         #banca
-        print(str(self.bancaHand) + " ", end="")
+        print(str(self.bancaHand) + " = ", end="")
         for c in self.bancaCards:
             print(c + " ", end="")
         print(": banca")
 
         #player
-        print(str(self.player.currentHand) + " ", end="")
+        print(str(self.player.currentHand) + " = ", end="")
         for c in self.playerCards:
             print(c + " ", end="")
         print(": player")
@@ -279,3 +293,6 @@ table.printTable()
 while(table.state != State.FINISH):
     table.resolveState()
     table.printTable()
+    if table.player.money >= table.player.objective:
+        print("Winner winner chicken dinner")
+        table.state = State.FINISH
