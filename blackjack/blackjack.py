@@ -91,7 +91,6 @@ class Table():
         # Evaluate if the player hand is > 21
         if self.player.currentHand > 21:
             print("The hand is over")
-            self.reset()
             self.state = State.SET_BET
         
         
@@ -136,6 +135,7 @@ class Table():
         elif option == 3:
             table.fold()
         elif option == 4:
+            self.reset()
             self.state = State.FINISH
         else:
             print("Wrong option, you have to write 1, 2, 3 or 4 ")
@@ -162,6 +162,7 @@ class Table():
         if self.state == State.SET_BET:
             if self.player.money == 0:
                 print("GAME OVER")
+                self.reset()
                 self.state = State.FINISH
                 return
             self.playerCards = []
