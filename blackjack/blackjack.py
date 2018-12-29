@@ -37,6 +37,8 @@ class Deck():
 
     def getCard(self):
         done = False
+        if not any(self.cards):
+            self.shuffle()
         while not done:
             card = random.randint(0,12)
             if self.cards[card] != 0:
@@ -56,10 +58,11 @@ class Deck():
 
     def shuffle(self):
         self.cards = [4*self.nDecks] * 13
+        print("Shuffle!")
 
     def printCards(self):
     	for c in self.cards:
-    		print(c, end=' ')
+    		print(c, end=" ")
     	print()
 
 class Table():
@@ -73,8 +76,10 @@ class Table():
         self.bancaCards = []
         self.state = State.SET_BET
         self.handsPlayed = 0
+        self.playerHasBlackJack = False
         
     def reset(self):
+        self.playerHasBlackJack = False
         self.bancaHand = 0
         self.playerCards = []
         self.bancaCards = []
@@ -89,17 +94,38 @@ class Table():
             self.player.currentHand += 10
         elif (self.player.currentHand+11) > 21:
             self.player.currentHand += 1
+            newcard = "1"
         else:
             self.player.currentHand += 11
         
         self.playerCards.append(newcard)
         
+        if self.player.currentHand > 21 and "As" in self.playerCards:
+            index = self.playerCards.index("As")
+            self.playerCards.remove("As")
+            self.player.currentHand -= 10
+            self.playerCards.insert(index, "1")
+        
         # Evaluate if the player hand is > 21
         if self.player.currentHand > 21:
             self.state = State.RESOLVE_ROUND
+        elif self.player.currentHand == 21:
+            self.state = State.BANCA_TURN
         
         
     def double(self):
+        #Restrictions
+        #Double option is only available if the player has 2 cards
+        if len(self.playerCards) > 2:
+            print("Double option is only available if the player has 2 cards")
+            return
+        
+        #Double option is only available if the player has 9, 10 or 11
+        if self.player.currentHand not in (9,10,11):
+            print("Double option is only available if you have 9, 10 or 11")
+            return
+        
+        #Double option
         #Double the bet if you can
         if (self.player.money - self.player.currentBet) < 0:
        	    print("You don't have enough money to double")
@@ -116,10 +142,17 @@ class Table():
             self.player.currentHand += 10
         elif (self.player.currentHand+11) > 21:
             self.player.currentHand += 1
+            newcard = "1"
         else:
             self.player.currentHand += 11
         
         self.playerCards.append(newcard)
+        
+        if self.player.currentHand > 21 and "As" in self.playerCards:
+            index = self.playerCards.index("As")
+            self.playerCards.remove("As")
+            self.player.currentHand -= 10
+            self.playerCards.insert(index, "1")
         
         # Evaluate if the player hand is > 21
         if self.player.currentHand > 21:
@@ -153,10 +186,17 @@ class Table():
                 self.bancaHand += 10
             elif (self.bancaHand+11) > 21:
                 self.bancaHand += 1
+                newcard = "1"
             else:
                 self.bancaHand += 11
             
             self.bancaCards.append(newcard)
+        
+        if self.bancaHand > 21 and "As" in self.bancaCards:
+            index = self.bancaCards.index("As")
+            self.bancaCards.remove("As")
+            self.bancaHand -= 10
+            self.bancaCards.insert(index, "1")
         
         if self.bancaHand >= 17:
             self.state = State.RESOLVE_ROUND
@@ -227,7 +267,11 @@ class Table():
                 
             self.playerCards.append(card)
             
-            self.state = State.PLAYER_TURN
+            if self.player.currentHand == 21:
+                self.playerHasBlackJack = True
+                self.state = State.BANCA_TURN
+            else:
+                self.state = State.PLAYER_TURN
 
         elif self.state == State.PLAYER_TURN:
             self.playerTurn()
@@ -238,7 +282,7 @@ class Table():
         elif self.state == State.RESOLVE_ROUND:
             if self.player.currentHand > 21:
                 print("The hand is over")
-            elif self.player.currentHand == 21 and self.bancaHand != 21:
+            elif self.playerHasBlackJack and self.bancaHand != 21:
                 print("Black Jack!!!!!")
                 self.player.money += self.player.currentBet*2+self.player.currentBet/2
                 
