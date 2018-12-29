@@ -57,6 +57,11 @@ class Deck():
     def shuffle(self):
         self.cards = [4*self.nDecks] * 13
 
+    def printCards(self):
+    	for c in self.cards:
+    		print(c, end=' ')
+    	print()
+
 class Table():
     """docstring for Table"""
     def __init__(self, nDecks, money, objective, nHands2shuffle):
@@ -67,6 +72,7 @@ class Table():
         self.playerCards = []
         self.bancaCards = []
         self.state = State.SET_BET
+        self.handsPlayed = 0
         
     def reset(self):
         self.bancaHand = 0
@@ -90,8 +96,7 @@ class Table():
         
         # Evaluate if the player hand is > 21
         if self.player.currentHand > 21:
-            print("The hand is over")
-            self.state = State.SET_BET
+            self.state = State.RESOLVE_ROUND
         
         
     def double(self):
@@ -118,8 +123,7 @@ class Table():
         
         # Evaluate if the player hand is > 21
         if self.player.currentHand > 21:
-            print("The hand is over")
-            self.state = State.SET_BET
+            self.state = State.RESOLVE_ROUND
         else:
             self.state = State.BANCA_TURN
 
@@ -147,7 +151,7 @@ class Table():
                 self.bancaHand += int(newcard)
             elif newcard in ("10","J","Q","K"):
                 self.bancaHand += 10
-            elif (self.player.currentHand+11) > 21:
+            elif (self.bancaHand+11) > 21:
                 self.bancaHand += 1
             else:
                 self.bancaHand += 11
@@ -165,6 +169,10 @@ class Table():
                 self.reset()
                 self.state = State.FINISH
                 return
+
+            if self.handsPlayed == self.nHands2shuffle:
+            	self.deck.shuffle()
+
             self.playerCards = []
             self.bancaCards = []
             self.bancaHand = 0
@@ -180,6 +188,9 @@ class Table():
                 print("You cannot bet more than money you have")
 
         elif self.state == State.DEAL_CARD:
+        	
+            self.handsPlayed += 1
+
             card = self.deck.getCard()
             if card not in ("10","J","Q","K","As"):
                 self.player.currentHand += int(card)
@@ -225,7 +236,9 @@ class Table():
             self.bancaTurn()
 
         elif self.state == State.RESOLVE_ROUND:
-            if self.player.currentHand == 21 and self.bancaHand != 21:
+            if self.player.currentHand > 21:
+                print("The hand is over")
+            elif self.player.currentHand == 21 and self.bancaHand != 21:
                 print("Black Jack!!!!!")
                 self.player.money += self.player.currentBet*2+self.player.currentBet/2
                 
