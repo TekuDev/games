@@ -151,6 +151,10 @@ class Table():
                 print("GAME OVER")
                 self.state = State.FINISH
                 return
+            elif self.player.money >= self.player.objective:
+                print("YOU WIN")
+                self.state = State.FINISH
+                return
             self.playerCards = []
             self.bancaCards = []
             self.bancaHand = 0
@@ -235,13 +239,13 @@ class Table():
     def printTable(self):
         print("--------------------------------------")
         #banca
-        print(str(self.bancaHand) + " ", end="")
+        print(str(self.bancaHand) + " = ", end="")
         for c in self.bancaCards:
             print(c + " ", end="")
         print(": banca")
 
         #player
-        print(str(self.player.currentHand) + " ", end="")
+        print(str(self.player.currentHand) + " = ", end="")
         for c in self.playerCards:
             print(c + " ", end="")
         print(": player")
