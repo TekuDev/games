@@ -210,11 +210,7 @@ class Table():
                 self.reset()
                 self.state = State.FINISH
                 return
-            elif self.player.money >= self.player.objective:
-                print("YOU WIN")
-                self.state = State.FINISH
-                return
-
+                
             if self.handsPlayed == self.nHands2shuffle:
             	self.deck.shuffle()
 
@@ -222,7 +218,7 @@ class Table():
             self.bancaCards = []
             self.bancaHand = 0
             self.player.currentHand = 0
-            
+
             bet = int(input("Introduce the bet for the next round (-1 to exit) "))
             if bet == -1:
                 self.state = State.FINISH
