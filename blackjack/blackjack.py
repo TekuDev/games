@@ -336,7 +336,7 @@ print("Reading configuration")
 #initial player money
 #money objective to end the game
 #number of hands without shuffle
-config_file = open(os.path.join(os.getcwd(), "blackjack/config.txt"), 'r') #TODO: fix the "absolute path dependency"
+config_file = open(os.path.join(os.getcwd(), "config.txt"), 'r')
 config_ndecks = int(config_file.readline())
 print("nDecks: "+str(config_ndecks))
 config_initialmoney = int(config_file.readline())
